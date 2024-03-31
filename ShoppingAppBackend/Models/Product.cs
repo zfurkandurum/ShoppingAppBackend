@@ -10,4 +10,5 @@ public class Product
     public double Price { get; set; }
     public string ProductPhotoUrl { get; set; }
     public Category category { get; set; }
+    public List<CartItem> Items { get; set; }
 }
