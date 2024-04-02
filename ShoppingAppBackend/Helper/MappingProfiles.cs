@@ -8,14 +8,22 @@ public class MappingProfiles : Profile
 {
     public MappingProfiles()
     {
-        CreateMap<Product, ProductDto>();
-        CreateMap<Category, CategoryDto>();
         CreateMap<Cart, CartDto>();
         CreateMap<CartItem, CartItemDto>();
+        CreateMap<Category, CategoryDto>();
+        CreateMap<Order, OrderDto>();
+        CreateMap<OrderItem, OrderItemDto>();
+        CreateMap<Product, ProductDto>();
+        CreateMap<UserDetail, UserDetailDto>();
+        CreateMap<User, UserDto>();
         
-        CreateMap<ProductDto, Product>();
-        CreateMap<CategoryDto, Category>();
         CreateMap<CartDto, Cart>();
         CreateMap<CartItemDto, CartItem>();
+        CreateMap<CategoryDto, Category>();
+        CreateMap<OrderDto, Order>();
+        CreateMap<OrderItemDto, OrderItem>();
+        CreateMap<ProductDto, Product>();
+        CreateMap<UserDetailDto, UserDetail>();
+        CreateMap<UserDto, User>();
     }
 }
