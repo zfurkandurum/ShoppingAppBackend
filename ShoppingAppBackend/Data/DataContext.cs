@@ -1,14 +1,17 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using ShoppingAppBackend.Models;
 
 namespace ShoppingAppBackend.Data;
 
-public class DataContext : DbContext
+public class DataContext : IdentityDbContext<ApplicationUser, IdentityRole<int>, int>
 {
     public DataContext(DbContextOptions<DataContext> options) : base(options)
     {
         
     }
+    
 
     public DbSet<Cart> Carts { get; set; }
     public DbSet<CartItem> CartItems { get; set; }
@@ -16,21 +19,19 @@ public class DataContext : DbContext
     public DbSet<Order> Orders { get; set; }
     public DbSet<OrderItem> OrderItems { get; set; }
     public DbSet<Product> Products { get; set; }
-    public DbSet<User> Users { get; set; }
-    public DbSet<UserDetail> UserDetails { get; set; }
-
-    
+    public DbSet<ApplicationUser> Users { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+
         modelBuilder.Entity<Cart>().HasKey(c => c.CartId);
         modelBuilder.Entity<CartItem>().HasKey(ci => ci.CartItemId);
         modelBuilder.Entity<Category>().HasKey(cat => cat.CategoryId);
         modelBuilder.Entity<Order>().HasKey(o => o.OrderId);
         modelBuilder.Entity<OrderItem>().HasKey(oi => oi.OrderItemId);
         modelBuilder.Entity<Product>().HasKey(p => p.ProductId);
-        modelBuilder.Entity<User>().HasKey(u => u.UserId);
-        modelBuilder.Entity<UserDetail>().HasKey(ud => ud.UserDetailId);
+        modelBuilder.Entity<ApplicationUser>().HasKey(u => u.Id);
         
         //----------------Product
         modelBuilder.Entity<Product>()
@@ -43,17 +44,12 @@ public class DataContext : DbContext
             .WithOne(ci => ci.Product)
             .HasForeignKey(p => p.CartItemId);
         //----------------User
-        modelBuilder.Entity<User>()
+        modelBuilder.Entity<ApplicationUser>()
             .HasOne(u => u.Cart)
             .WithOne(c => c.User)
-            .HasForeignKey<Cart>(c => c.CartId);
-        
-        modelBuilder.Entity<User>()
-            .HasOne(u => u.Detail)
-            .WithOne(ud => ud.User)
-            .HasForeignKey<User>(u => u.UserDetailId);
+            .HasForeignKey<Cart>(c => c.UserId);
 
-        modelBuilder.Entity<User>()
+        modelBuilder.Entity<ApplicationUser>()
             .HasMany<Order>(u => u.Orders)
             .WithOne(o => o.User)
             .HasForeignKey(u => u.OrderId);
