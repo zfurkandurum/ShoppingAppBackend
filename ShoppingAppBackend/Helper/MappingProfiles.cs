@@ -14,8 +14,8 @@ public class MappingProfiles : Profile
         CreateMap<Order, OrderDto>();
         CreateMap<OrderItem, OrderItemDto>();
         CreateMap<Product, ProductDto>();
-        CreateMap<UserDetail, UserDetailDto>();
-        CreateMap<User, UserDto>();
+        CreateMap<ApplicationUser, RegisterDto>();
+        CreateMap<ApplicationUser, LoginDto>();
         
         CreateMap<CartDto, Cart>();
         CreateMap<CartItemDto, CartItem>();
@@ -23,7 +23,7 @@ public class MappingProfiles : Profile
         CreateMap<OrderDto, Order>();
         CreateMap<OrderItemDto, OrderItem>();
         CreateMap<ProductDto, Product>();
-        CreateMap<UserDetailDto, UserDetail>();
-        CreateMap<UserDto, User>();
+        CreateMap<RegisterDto, ApplicationUser>();
+        CreateMap<LoginDto, ApplicationUser>();
     }
 }
