@@ -77,7 +77,7 @@ public class AuthController : ControllerBase
     [Route("login")]
     public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
     {
-        var user = await _userManager.FindByEmailAsync(loginDto.Email);
+        var user = await _userManager.FindByNameAsync(loginDto.Email);
         
         if (user == null)
             return BadRequest("user not found");
@@ -91,7 +91,7 @@ public class AuthController : ControllerBase
 
         var authClaims = new List<Claim>
         {
-            new Claim(ClaimTypes.Name, user.UserName),
+            new Claim(ClaimTypes.Email, user.Email),
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim("JWTID", Guid.NewGuid().ToString()),
         };
