@@ -17,21 +17,14 @@ public class UserRepository : IUserRepository
         return _context.Users.ToList();
     }
 
-    public ApplicationUser GetUser(int userId)
+    public ApplicationUser GetUser(string email)
     {
-        return _context.Users.Where(u => u.Id == userId).FirstOrDefault();
-    }
-
-    public bool UserExists(int userId)
-    {
-        return _context.Users.Any(u => u.Id == userId);
+        return _context.Users.Where(u => u.Email == email).FirstOrDefault();
     }
     
-
-    public bool CreateUser(ApplicationUser user)
+    public bool UserExists(string email)
     {
-        _context.Add(user);
-        return Save();
+        return _context.Users.Any(u => u.Email == email);
     }
 
     public bool UpdateUser(ApplicationUser user)

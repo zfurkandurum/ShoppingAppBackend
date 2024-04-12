@@ -12,13 +12,13 @@ namespace ShoppingAppBackend.Controllers;
 [ApiController]
 public class UserController : Controller
 {
-    private readonly UserManager<IdentityUser> _userManager;
-    private readonly RoleManager<IdentityRole> _roleManager;
+    private readonly UserManager<ApplicationUser> _userManager;
+    private readonly RoleManager<IdentityRole<int>> _roleManager;
     private readonly IConfiguration _configuration;
     private readonly IUserRepository _userRepository;
     private readonly IMapper _mapper;
 
-    public UserController(IUserRepository userRepository, IMapper mapper,UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
+    public UserController(IUserRepository userRepository, IMapper mapper,UserManager<ApplicationUser> userManager, RoleManager<IdentityRole<int>> roleManager, IConfiguration configuration)
     {
         _userRepository = userRepository;
         _mapper = mapper;
@@ -38,16 +38,16 @@ public class UserController : Controller
 
         return Ok(users);
     }
-
-    [HttpGet("{userId}")]
+    
+    [HttpGet("{email}")]
     [ProducesResponseType(200, Type = typeof(Category))]
     [ProducesResponseType(400)]
-    public IActionResult GetUserById(int userId)
+    public async Task<IActionResult> GetUserByEmail(string email)
     {
-        if (!_userRepository.UserExists(userId))
+        var user =await _userManager.FindByNameAsync(email);
+        
+        if (user == null) 
             return BadRequest(ModelState);
-
-        var user = _mapper.Map<ApplicationUser>(_userRepository.GetUser(userId));
         
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
@@ -55,72 +55,40 @@ public class UserController : Controller
         return Ok(user);
     }
     
-    [HttpPost]
-    [ProducesResponseType(204)]
-    [ProducesResponseType(400)]
-    public IActionResult UpdateUser([FromBody] UserDto createUser)
-    {
-        if (createUser == null)
-            return BadRequest(ModelState);
-
-        var user = _userRepository.GetAllUsers()
-            .Where(u => u.Id == createUser.UserId).FirstOrDefault();
-
-        if (user != null)
-        {
-            ModelState.AddModelError("","Already Exists");
-            return StatusCode(422, ModelState);
-        }
-        
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-
-        var userMap = _mapper.Map<ApplicationUser>(createUser);
-        if (!_userRepository.CreateUser(userMap))
-        {
-            ModelState.AddModelError("","error");
-            return StatusCode(500, ModelState);
-        }
-        return Ok("User Created");
-    }
-
     [HttpPut]
-    [ProducesResponseType(204)]
-    [ProducesResponseType(400)]
-    public IActionResult UpdateUser(int userId, [FromBody] UserDto updateUser)
+    [Route("update")]
+    public async Task<IActionResult> UpdateUser([FromBody] UserDto userDto)
     {
-        if (updateUser == null)
-            return BadRequest(ModelState);
+        var user = await _userManager.FindByNameAsync(userDto.Email);
 
-        if (userId != updateUser.UserId)
-            return BadRequest(ModelState);
+        if (user == null)
+            return BadRequest("User not found");
 
-        if (!_userRepository.UserExists(userId))
-            return NotFound();
-        
-        if (!ModelState.IsValid)
-            return BadRequest();
+        user.FirstName = userDto.FirstName;
+        user.LastName = userDto.LastName;
+        user.Phone = userDto.Phone;
+        user.Address = userDto.Address;
 
-        var userMap = _mapper.Map<ApplicationUser>(updateUser);
-        
-        if (!_userRepository.UpdateUser(userMap))
-        {
-            ModelState.AddModelError("", "error");
-            return StatusCode(500, ModelState);
-        }
-        return Ok();
+        // Adres güncelleme işlemi için ek kontrol veya işlemler eklenebilir
+
+        var updateUserResult = await _userManager.UpdateAsync(user);
+
+        if (!updateUserResult.Succeeded)
+            return BadRequest(updateUserResult.Errors);
+
+        return Ok("User updated successfully");
     }
-
-    [HttpDelete("{userId}")]
+    
+    [HttpDelete("{email}")]
     [ProducesResponseType(400)]
     [ProducesResponseType(204)]
     [ProducesResponseType(404)]
-    public IActionResult DeleteUser(int userId)
+    public IActionResult DeleteUser(string email)
     {
-        if (!_userRepository.UserExists(userId))
+        if (!_userRepository.UserExists(email))
             return BadRequest(ModelState);
 
-        var userDelete = _userRepository.GetUser(userId);
+        var userDelete = _userRepository.GetUser(email);
         
         if(!ModelState.IsValid)
             return BadRequest(ModelState);
