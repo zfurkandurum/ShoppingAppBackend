@@ -39,12 +39,12 @@ public class UserController : Controller
         return Ok(users);
     }
     
-    [HttpGet("{email}")]
-    [ProducesResponseType(200, Type = typeof(Category))]
+    [HttpGet]
     [ProducesResponseType(400)]
-    public async Task<IActionResult> GetUserByEmail(string email)
+    [Route("getUserById")]
+    public async Task<IActionResult> GetUserById(int id)
     {
-        var user =await _userManager.FindByNameAsync(email);
+        var user = _mapper.Map<UserDto>(_userRepository.GetUserById(id));
         
         if (user == null) 
             return BadRequest(ModelState);
@@ -53,6 +53,22 @@ public class UserController : Controller
             return BadRequest(ModelState);
 
         return Ok(user);
+    }
+    
+    [HttpGet]
+    [ProducesResponseType(400)]
+    [Route("getUserByEmail")]
+    public Task<IActionResult> GetUserByEmail(string email)
+    {
+        var user = _mapper.Map<UserDto>(_userRepository.GetUserByEmail(email));
+        
+        if (user == null) 
+            return Task.FromResult<IActionResult>(BadRequest(ModelState));
+        
+        if (!ModelState.IsValid)
+            return Task.FromResult<IActionResult>(BadRequest(ModelState));
+
+        return Task.FromResult<IActionResult>(Ok(user));
     }
     
     [HttpPut]
@@ -88,7 +104,7 @@ public class UserController : Controller
         if (!_userRepository.UserExists(email))
             return BadRequest(ModelState);
 
-        var userDelete = _userRepository.GetUser(email);
+        var userDelete = _userRepository.GetUserByEmail(email);
         
         if(!ModelState.IsValid)
             return BadRequest(ModelState);

@@ -9,7 +9,13 @@ public class ApplicationUser : IdentityUser<int>
     public string Email { get; set; }
     public string? Phone { get; set; }
     public string? Address { get; set; }
-    public int CartId { get; set; }
-    public Cart Cart { get; set; }
+    
+    public List<Cart> Carts { get; set; }
     public List<Order> Orders { get; set; }
+    
+    public ApplicationUser()
+    {
+        Carts = new List<Cart> { new Cart { Items = new List<CartItem>() } };
+    }
+    
 }

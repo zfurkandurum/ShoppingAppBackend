@@ -17,7 +17,12 @@ public class UserRepository : IUserRepository
         return _context.Users.ToList();
     }
 
-    public ApplicationUser GetUser(string email)
+    public ApplicationUser GetUserById(int id)
+    {
+        return _context.Users.Where(u => u.Id == id).FirstOrDefault();
+    }
+
+    public ApplicationUser GetUserByEmail(string email)
     {
         return _context.Users.Where(u => u.Email == email).FirstOrDefault();
     }
